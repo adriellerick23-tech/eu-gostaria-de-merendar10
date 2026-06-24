@@ -82,9 +82,9 @@
     // Importações Oficiais das Ferramentas da Google (Firebase v10)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // ⚙️ SEUS DADOS REAIS DO FIREBASE JÁ INTEGRADOS
+    // ⚙️ SEUS DADOS REAIS DO FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyA__eTnamFQ9fPVUSiQYIUpoodNJ_izjL4", 
         authDomain: "merenda-a546e.firebaseapp.com",
@@ -108,24 +108,25 @@
     let qrConteiner = document.getElementById("qrcode");
     let qrcode = new QRCode(qrConteiner, { width: 180, height: 180 });
 
-    // --- LÓGICA DE LOGIN DO ALUNO ---
+    // --- LÓGICA DE LOGIN VIA REDIRECIONAMENTO (ANTI-BLOQUEIO) ---
     window.fazerLoginGoogle = function() {
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                let user = result.user;
-                let email = user.email.toLowerCase();
+        signInWithRedirect(auth, provider);
+    }
 
-                // Garante o bloqueio de e-mails fora do padrão do Piauí
+    // Captura o resultado do login após o redirecionamento voltar para a página
+    getRedirectResult(auth)
+        .then((result) => {
+            if (result && result.user) {
+                let email = result.user.email.toLowerCase();
                 if (!email.endsWith("@aluno.edu.pi.gov.br")) {
                     alert("Acesso Negado! Use sua conta institucional @aluno.edu.pi.gov.br");
                     signOut(auth);
-                    return;
                 }
-            }).catch((error) => {
-                console.error("Erro no login: ", error);
-                alert("Falha na autenticação com o Google. Certifique-se de que o provedor está ativo no console do Firebase.");
-            });
-    }
+            }
+        }).catch((error) => {
+            console.error("Erro no redirecionamento: ", error);
+            alert("Erro de autenticação. Certifique-se de que as credenciais e domínios estão corretos.");
+        });
 
     window.fazerLogout = function() {
         signOut(auth);
@@ -225,13 +226,17 @@
     }
 
     function tocarSom(sucesso) {
-        let ctx = new (window.AudioContext || window.webkitAudioContext)();
-        let osc = ctx.createOscillator();
-        osc.type = "sine";
-        osc.frequency.value = sucesso ? 800 : 300;
-        osc.connect(ctx.destination);
-        osc.start();
-        setTimeout(() => osc.stop(), sucesso ? 150 : 500);
+        try {
+            let ctx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = ctx.createOscillator();
+            osc.type = "sine";
+            osc.frequency.value = sucesso ? 800 : 300;
+            osc.connect(ctx.destination);
+            osc.start();
+            setTimeout(() => osc.stop(), sucesso ? 150 : 500);
+        } catch (e) {
+            console.log("Áudio bloqueado temporariamente.");
+        }
     }
 </script>
 </body>
