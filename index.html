@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Merenda - Seduc PI</title>
-    <!-- Bibliotecas Necessárias para Gerar e Ler o QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     
@@ -39,11 +38,9 @@
     <p class="subtitulo">Validação por E-mail Institucional (@aluno.edu.pi.gov.br)</p>
     
     <div class="flex-grid">
-        <!-- LADO 1: ÁREA DO ALUNO -->
         <div class="secao" style="flex: 1; min-width: 280px;">
-            <h3>1. Área do Aluno (Gerar QR)</h3>
+            <h3>1. Area do Aluno (Gerar QR)</h3>
             
-            <!-- Tela antes do login -->
             <div id="area-deslogado">
                 <p>Para gerar seu QR Code, comprove sua identidade:</p>
                 <button id="btnGoogle" onclick="fazerLoginGoogle()">
@@ -52,7 +49,6 @@
                 </button>
             </div>
 
-            <!-- Tela após o login válido -->
             <div id="area-logado" class="escondido">
                 <p>Olá, <strong id="nomeAluno">...</strong>!</p>
                 <p style="font-size: 12px; color: #666;" id="emailAluno">...</p>
@@ -62,7 +58,6 @@
             </div>
         </div>
 
-        <!-- LADO 2: SCANNER DA COZINHA -->
         <div class="secao" style="flex: 1; min-width: 280px;">
             <h3>2. Scanner da Merenda (Cozinha/Portaria)</h3>
             <div id="reader"></div>
@@ -70,7 +65,6 @@
         </div>
     </div>
 
-    <!-- SEÇÃO DO ADMINISTRADOR -->
     <div class="secao">
         <h3>3. Painel do Administrador (Requer Senha)</h3>
         <button class="warning" onclick="autorizarNovamente()">Autorizar Aluno Repetir</button>
@@ -84,18 +78,18 @@
     import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // ⚙️ SEUS DADOS REAIS DO FIREBASE
+    // ⚙️ CONFIGURAÇÃO OFICIAL E CORRIGIDA DO SEU FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyA__eTnamFQ9fPVUSiQYIUpoodNJ_izjL4", 
         authDomain: "merenda-a546e.firebaseapp.com",
-        databaseURL: "https://merenda-a546e-default-rtdb.firebaseio.com/",
+        databaseURL: "https://merenda-a546e-default-rtdb.firebaseio.com",
         projectId: "merenda-a546e",
         storageBucket: "merenda-a546e.firebasestorage.app",
         messagingSenderId: "276316655746", 
         appId: "1:276316655746:web:5bbc6720936c63628a649b" 
     };
 
-    // Inicialização interna das funções
+    // Inicialização das funções
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const auth = getAuth(app);
@@ -125,7 +119,6 @@
             }
         }).catch((error) => {
             console.error("Erro no redirecionamento: ", error);
-            alert("Erro de autenticação. Certifique-se de que as credenciais e domínios estão corretos.");
         });
 
     window.fazerLogout = function() {
